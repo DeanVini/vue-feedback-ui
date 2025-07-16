@@ -35,13 +35,14 @@
                 <template #legend>
                   <div class="flex items-center pl-2">
                     <Avatar icon="pi pi-user" shape="circle" />
-                    <span class="font-bold p-2">{{ feedback.customerName }}</span>
+                    <span class="font-bold p-2"
+                      >{{ feedback.customerName }} - {{ getDistanceDate(feedback.createdAt) }}
+                    </span>
                   </div>
                 </template>
                 <div class="w-full min-w-[45rem] flex justify-between relative">
                   <p class="pl-5 intro-y">
                     {{ feedback.message }}
-                    {{ getDistanceDate(feedback.createdAt) }}
                   </p>
                   <div class="flex pr-3">
                     <Button
@@ -109,7 +110,7 @@ const averageRating = ref<number>(0)
 const isFeedbackCreationDialogVisible = ref<boolean>(false)
 
 const getDistanceDate = (date: Date) => {
-  return formatDistance(subDays(date, 3), new Date(), { addSuffix: true, locale: ptBR })
+  return formatDistance(date, new Date(), { addSuffix: true, locale: ptBR })
 }
 
 const getFeedbacks = async (page = currentPage.value, limit = currentLimit.value) => {
