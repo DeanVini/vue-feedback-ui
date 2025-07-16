@@ -46,18 +46,12 @@
                   </p>
                   <div class="flex pr-3">
                     <Button
-                      icon="pi pi-pencil"
+                      icon="pi pi-eye"
                       severity="contrast"
                       variant="text"
                       rounded
                       aria-label="Search"
-                    />
-                    <Button
-                      icon="pi pi-trash"
-                      severity="danger"
-                      variant="text"
-                      rounded
-                      aria-label="Search"
+                      @click="openFeedbackEditDialog(feedback)"
                     />
                   </div>
                   <div class="absolute p-2 w-full flex justify-end -top-11">
@@ -88,9 +82,24 @@
       </template>
     </Card>
   </div>
-  <Button label="Show" @click="show()" />
 
-  <FeedbackCreationDialog v-model:visible="isFeedbackCreationDialogVisible" />
+  <FeedbackCreationDialog
+    v-model:visible="isFeedbackCreationDialogVisible"
+    @success="
+      () => {
+        getFeedbacks()
+      }
+    "
+  />
+  <FeedbackEditDialog
+    v-model:visible="isFeedbackEditDialogVisible"
+    :feedback="feedbackToEdit"
+    @success="
+      () => {
+        getFeedbacks()
+      }
+    "
+  />
 </template>
 
 <script setup lang="ts">
@@ -101,6 +110,7 @@ import type { Feedback } from '@/interfaces/feedback.ts'
 import { formatDistance } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import FeedbackCreationDialog from '@/components/FeedbackCreationDialog.vue'
+import FeedbackEditDialog from '@/components/FeedbackEditDialog.vue'
 
 const feedbackService = useFeedbackService()
 const feedbacks = ref<Feedback[]>([])
@@ -110,6 +120,8 @@ const currentPage = ref<number>(1)
 const totalRecords = ref<number>(0)
 const averageRating = ref<number>(0)
 const isFeedbackCreationDialogVisible = ref<boolean>(false)
+const isFeedbackEditDialogVisible = ref<boolean>(false)
+const feedbackToEdit = ref<Feedback>({})
 
 const getDistanceDate = (date: Date) => {
   return formatDistance(date, new Date(), { addSuffix: true, locale: ptBR })
@@ -124,6 +136,11 @@ const getFeedbacks = async (page = currentPage.value, limit = currentLimit.value
   } catch (error) {
     console.error('Erro ao buscar os feedbacks', error)
   }
+}
+
+const openFeedbackEditDialog = (feedback: Feedback) => {
+  feedbackToEdit.value = feedback
+  isFeedbackEditDialogVisible.value = true
 }
 
 onMounted(async () => {

@@ -10,6 +10,7 @@ import { primeVueTheme } from '@/theme/primeVueTheme.ts'
 import '/src/assets/animation/intro.scss'
 import 'primeicons/primeicons.css'
 import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 
 const app = createApp(App)
 
@@ -20,6 +21,7 @@ app.use(PrimeVue, {
     preset: primeVueTheme,
   },
 })
+app.use(ConfirmationService)
 app.use(ToastService)
 app.directive('tooltip', Tooltip)
 

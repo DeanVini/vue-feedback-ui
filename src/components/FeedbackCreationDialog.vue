@@ -83,6 +83,7 @@
         </StepPanel>
       </StepPanels>
     </Stepper>
+    <Button label="Show" @click="show()" />
   </Dialog>
 </template>
 
@@ -94,6 +95,8 @@ import RatingForm from '@/components/RatingForm.vue'
 import { useFeedbackService } from '@/composables/useFeedbackService.ts'
 import { useToast } from 'primevue/usetoast'
 
+const emit = defineEmits(['success'])
+
 const toast = useToast()
 
 const visible = defineModel('visible', {
@@ -103,6 +106,10 @@ const visible = defineModel('visible', {
 })
 
 const activeStep = ref(1)
+
+const show = () => {
+  toast.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 })
+}
 
 const feedbackCreationForm = ref({
   customerName: '',
@@ -133,6 +140,7 @@ const publishFeedback = () => {
         detail: 'A sua avaliação foi publicada com sucesso. Muito obrigado!',
         life: 3000,
       })
+      emit('success')
     })
     .catch((error) => {
       console.error('Error publishing feedback:', error)
