@@ -83,7 +83,6 @@
         </StepPanel>
       </StepPanels>
     </Stepper>
-    <Button label="Show" @click="show()" />
   </Dialog>
 </template>
 
