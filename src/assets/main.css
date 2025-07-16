@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+@import './base.css';
+
+@theme {
+  --color-lavender-50: #e0ffe0;
+  --color-lavender-100: #c8fec8;
+  --color-lavender-200: #79fe79;
+  --color-lavender-300: #2df52d;
+  --color-lavender-400: #28e228;
+  --color-lavender-500: #25d325;
+  --color-lavender-600: #1aa41a;
+  --color-lavender-700: #117c11;
+  --color-lavender-800: #085308;
+  --color-lavender-900: #022d02;
+  --color-lavender-950: #011b01;
+}
+
+
