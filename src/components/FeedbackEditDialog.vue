@@ -14,7 +14,6 @@
       </div>
     </template>
     <div class="p-4">
-      <!-- Informações do cliente -->
       <div class="mb-4">
         <div class="flex items-center gap-2">
           <Avatar icon="pi pi-user" shape="circle" />
@@ -22,8 +21,6 @@
         </div>
         <span class="text-sm text-gray-500">{{ props.feedback?.customerEmail }}</span>
       </div>
-
-      <!-- Avaliação -->
       <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Avaliação:</label>
         <div v-if="!isEditing" class="flex items-center" @click="enableEditing">
@@ -35,8 +32,6 @@
           <small v-if="errors.rating" class="p-error block mt-1">{{ errors.rating }}</small>
         </div>
       </div>
-
-      <!-- Mensagem -->
       <div class="mb-5">
         <label class="block text-sm font-medium mb-1">Mensagem:</label>
         <div
@@ -58,10 +53,8 @@
           <small v-if="errors.message" class="p-error block mt-1">{{ errors.message }}</small>
         </div>
       </div>
-
-      <!-- Botões de ações -->
-      <div class="flex justify-between translate-y-3">
-        <div class="flex gap-2">
+      <div class="flex justify-between mt-4">
+        <div class="flex gap-3">
           <Button v-if="!isEditing" icon="pi pi-pencil" label="Editar" @click="enableEditing" />
           <Button
             v-if="!isEditing"
@@ -71,7 +64,7 @@
             @click="confirmDelete"
           />
         </div>
-        <div v-if="isEditing" class="flex gap-2">
+        <div v-if="isEditing" class="flex gap-3">
           <Button icon="pi pi-times" label="Cancelar" severity="secondary" @click="cancelEditing" />
           <Button
             icon="pi pi-check"
@@ -83,8 +76,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Diálogo de confirmação de exclusão -->
     <ConfirmDialog />
   </Dialog>
 </template>
@@ -96,14 +87,14 @@ import {
   Textarea,
   Rating,
   Avatar,
-  Toast,
   ConfirmDialog,
   useToast,
   useConfirm,
 } from 'primevue'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import * as yup from 'yup'
 import { useFeedbackService } from '@/composables/useFeedbackService'
+import type { Feedback, FeedbackInput } from '@/interfaces/feedback'
 
 const emit = defineEmits(['success', 'update'])
 const toast = useToast()
@@ -118,7 +109,7 @@ const visible = defineModel('visible', {
 
 const props = defineProps({
   feedback: {
-    type: Object,
+    type: Object as () => Feedback,
     required: true,
   },
 })
@@ -132,16 +123,24 @@ const errors = reactive({
   rating: '',
 })
 
-onMounted(() => {
-  // Inicializar valores quando o componente for montado
-  resetForm()
-})
+watch(
+  [visible, () => props.feedback],
+  ([newVisible, newFeedback]) => {
+    if (newVisible && newFeedback) {
+      resetForm()
+    }
+  },
+  { immediate: true, deep: true },
+)
 
 const resetForm = () => {
-  currentMessage.value = props.feedback?.message || ''
-  currentRating.value = props.feedback?.rating || 0
+  if (props.feedback) {
+    currentMessage.value = props.feedback.message || ''
+    currentRating.value = props.feedback.rating || 0
+  }
   errors.message = ''
   errors.rating = ''
+  isEditing.value = false
 }
 
 const schema = yup.object().shape({
@@ -182,21 +181,24 @@ const enableEditing = () => {
 
 const cancelEditing = () => {
   resetForm()
-  isEditing.value = false
 }
 
-// Salvar alterações
 const saveFeedback = async () => {
   if (await validate()) {
     loading.value = true
     try {
-      const updatedFeedback = {
-        ...props.feedback,
-        message: currentMessage.value,
-        rating: currentRating.value,
+      if (!props.feedback || !props.feedback.id) {
+        throw new Error('ID do feedback não encontrado')
       }
 
-      await feedbackService.update(updatedFeedback.id, updatedFeedback)
+      const feedbackToUpdate: FeedbackInput = {
+        message: currentMessage.value,
+        rating: currentRating.value,
+        customerName: props.feedback.customerName || '',
+        customerEmail: props.feedback.customerEmail || '',
+      }
+
+      await feedbackService.update(props.feedback.id, feedbackToUpdate)
 
       toast.add({
         severity: 'success',
@@ -204,6 +206,13 @@ const saveFeedback = async () => {
         detail: 'Feedback atualizado com sucesso!',
         life: 3000,
       })
+
+      // Emitir o feedback atualizado
+      const updatedFeedback = {
+        ...props.feedback,
+        message: currentMessage.value,
+        rating: currentRating.value,
+      }
 
       emit('update', updatedFeedback)
       emit('success')
@@ -236,6 +245,10 @@ const confirmDelete = () => {
 const deleteFeedback = async () => {
   loading.value = true
   try {
+    if (!props.feedback || !props.feedback.id) {
+      throw new Error('ID do feedback não encontrado')
+    }
+
     await feedbackService.remove(props.feedback.id)
 
     toast.add({
@@ -271,5 +284,13 @@ const closeDialog = () => {
 <style scoped>
 .p-dialog-content {
   overflow-x: hidden;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.flex.justify-between {
+  margin-top: 1rem;
 }
 </style>
