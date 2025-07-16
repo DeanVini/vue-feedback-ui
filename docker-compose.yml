@@ -1,0 +1,9 @@
+version: "3"
+services:
+  vue_feedback_ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vue_feedback_ui
+    ports:
+      - "5173:80"

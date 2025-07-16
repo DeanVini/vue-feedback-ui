@@ -112,8 +112,6 @@ const feedbackCreationForm = ref({
 })
 
 const editForm = (newForm: object) => {
-  console.log(newForm)
-  console.log(feedbackCreationForm.value)
   feedbackCreationForm.value = Object.assign(feedbackCreationForm.value, newForm)
 }
 

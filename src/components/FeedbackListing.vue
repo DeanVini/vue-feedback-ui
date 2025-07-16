@@ -88,6 +88,8 @@
       </template>
     </Card>
   </div>
+  <Button label="Show" @click="show()" />
+
   <FeedbackCreationDialog v-model:visible="isFeedbackCreationDialogVisible" />
 </template>
 
@@ -96,7 +98,7 @@ import { Fieldset, Avatar, Paginator, Card, Button, Rating } from 'primevue'
 import { onMounted, ref } from 'vue'
 import { useFeedbackService } from '@/composables/useFeedbackService.ts'
 import type { Feedback } from '@/interfaces/feedback.ts'
-import { formatDistance, subDays } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import FeedbackCreationDialog from '@/components/FeedbackCreationDialog.vue'
 
